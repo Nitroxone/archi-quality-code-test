@@ -8,6 +8,14 @@ import {
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELED = 'CANCELED',
+}
+
 @Entity()
 export class Order {
   static MAX_ITEMS = 5;
