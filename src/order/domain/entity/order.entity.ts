@@ -10,6 +10,7 @@ import { Expose } from 'class-transformer';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
+  SHIPPING_ADDRESS_SET = 'SHIPPING_ADDRESS_SET',
   PAID = 'PAID',
   SHIPPED = 'SHIPPED',
   DELIVERED = 'DELIVERED',
@@ -23,6 +24,8 @@ export class Order {
   static AMOUNT_MINIMUM = 5;
 
   static AMOUNT_MAXIMUM = 500;
+
+  static SHIPPING_COST = 5;
 
   @CreateDateColumn()
   @Expose({ groups: ['group_orders'] })
@@ -77,5 +80,23 @@ export class Order {
 
     this.status = OrderStatus.PAID;
     this.paidAt = new Date();
+  }
+
+  setShippingAddress(customerAddress: string): void {
+    if (
+      this.status !== OrderStatus.PENDING &&
+      this.status !== OrderStatus.SHIPPING_ADDRESS_SET
+    ) {
+      throw new Error('Commande non payée');
+    }
+
+    if (this.orderItems.length < Order.MAX_ITEMS) {
+      throw new Error('Trop d’articles');
+    }
+
+    this.status = OrderStatus.SHIPPING_ADDRESS_SET;
+    this.shippingAddressSetAt = new Date();
+    this.shippingAddress = customerAddress;
+    this.price += Order.SHIPPING_COST;
   }
 }
