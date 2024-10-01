@@ -22,6 +22,8 @@ export class Order {
 
   static AMOUNT_MINIMUM = 5;
 
+  static AMOUNT_MAXIMUM = 500;
+
   @CreateDateColumn()
   @Expose({ groups: ['group_orders'] })
   createdAt: Date;
@@ -65,6 +67,14 @@ export class Order {
   private paidAt: Date | null;
 
   pay(): void {
+    if (this.status !== OrderStatus.PENDING) {
+      throw new Error('Commande déjà payée');
+    }
+
+    if (this.price > Order.AMOUNT_MAXIMUM) {
+      throw new Error('Montant maximum dépassé');
+    }
+
     this.status = OrderStatus.PAID;
     this.paidAt = new Date();
   }

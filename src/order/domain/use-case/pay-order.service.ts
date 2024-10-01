@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { Order, OrderStatus } from 'src/order/domain/entity/order.entity';
+import { Order } from 'src/order/domain/entity/order.entity';
 import OrderRepository from 'src/order/infrastructure/order.repository';
 
 export class PayOrderService {
