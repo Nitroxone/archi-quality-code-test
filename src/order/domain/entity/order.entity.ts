@@ -48,6 +48,8 @@ export class Order {
   @Expose({ groups: ['group_orders'] })
   shippingAddress: string | null;
 
+  @Column({ nullable: true })
+  @Expose({ groups: ['group_orders'] })
   invoiceAddress: string | null;
 
   @Column({ nullable: true })
@@ -56,9 +58,14 @@ export class Order {
 
   @Column()
   @Expose({ groups: ['group_orders'] })
-  status: string;
+  private status: string;
 
   @Column({ nullable: true })
   @Expose({ groups: ['group_orders'] })
-  paidAt: Date | null;
+  private paidAt: Date | null;
+
+  pay(): void {
+    this.status = OrderStatus.PAID;
+    this.paidAt = new Date();
+  }
 }
