@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Order } from 'src/order/domain/entity/order.entity';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import {
   CreateOrderCommand,
-  CreateOrderService,
-} from 'src/order/domain/use-case/create-order.service';
+  Order,
+} from 'src/order/domain/entity/order.entity';
+import { CreateOrderService } from 'src/order/domain/use-case/create-order.service';
 import { PayOrderService } from 'src/order/domain/use-case/pay-order.service';
 
 @Controller('/orders')
@@ -16,12 +16,12 @@ export default class OrderController {
   @Post()
   async createOrder(
     @Body() createOrderCommand: CreateOrderCommand,
-  ): Promise<string> {
-    return this.createOrderService.createOrder(createOrderCommand);
+  ): Promise<Order> {
+    return this.createOrderService.execute(createOrderCommand);
   }
 
   @Post()
   async payOrder(@Param('id') id: string): Promise<Order> {
-    return await this.payOrderService.payOrder(id);
+    return await this.payOrderService.execute(id);
   }
 }
