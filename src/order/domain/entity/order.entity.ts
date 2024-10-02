@@ -78,6 +78,14 @@ export class Order {
   @Expose({ groups: ['group_orders'] })
   private paidAt: Date | null;
 
+  @Column({ nullable: true })
+  @Expose({ groups: ['group_orders'] })
+  private cancelAt: Date | null;
+
+  @Column({ nullable: true })
+  @Expose({ groups: ['group_orders'] })
+  private cancelReason: string | null;
+
   // methode factory : permet de ne pas utiliser le constructor
   // car le constructor est utilisé par typeorm
   // public createOrder(createOrderCommand: CreateOrderCommand): Order {
@@ -177,5 +185,32 @@ export class Order {
     this.shippingAddressSetAt = new Date();
     this.shippingAddress = customerAddress;
     this.price += Order.SHIPPING_COST;
+  }
+
+  setInvoiceAddress(invoiceAddress?: string): void {
+    if (this.status !== OrderStatus.SHIPPING_ADDRESS_SET) {
+      throw new Error('Adresse de livraison non définie');
+    }
+
+    if (!invoiceAddress) {
+      this.invoiceAddress = this.shippingAddress;
+      return;
+    }
+
+    this.invoiceAddress = invoiceAddress;
+  }
+
+  cancel(cancelReason: string): void {
+    if (
+      this.status === OrderStatus.SHIPPED ||
+      this.status === OrderStatus.DELIVERED ||
+      this.status === OrderStatus.CANCELED
+    ) {
+      throw new Error('Vous ne pouvez pas annuler cette commande');
+    }
+
+    this.status = OrderStatus.CANCELED;
+    this.cancelAt = new Date('NOW');
+    this.cancelReason = cancelReason;
   }
 }
