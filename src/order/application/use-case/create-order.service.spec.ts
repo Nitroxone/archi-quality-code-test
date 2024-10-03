@@ -14,7 +14,7 @@ describe("an order can't be created if the order have more than 5 item", () => {
   it('should return an error', async () => {
     const createOrderService = new CreateOrderService(orderRepositoryFake);
 
-    const order = await createOrderService.execute({
+    const createOrderOutput = await createOrderService.execute({
       customerName: 'John Doe',
       items: [
         { productName: 'item 1', price: 10, quantity: 1 },
@@ -28,6 +28,6 @@ describe("an order can't be created if the order have more than 5 item", () => {
       invoiceAddress: 'Invoice Address',
     });
 
-    expect(order).toBeInstanceOf(Error);
+    expect(createOrderOutput).rejects.toThrow();
   });
 });
