@@ -241,4 +241,16 @@ export class Order {
       it.product.addStock(it.quantity);
     });
   }
+
+  public addItem(item: OrderItem) {
+    const found = this.orderItems.find(x => x.id === item.id);
+
+    if (!found) {
+      this.orderItems.push(item);
+    }
+  }
+
+  isPending(): boolean {
+    return this.status === OrderStatus.PENDING;
+  }
 }
