@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { BadRequestException } from '@nestjs/common';
+import { EmailSenderServiceInterface } from '../port/email/email-sender.service.interface';
 
 export interface CreateProductCommand {
     name: string;
@@ -86,5 +87,19 @@ export class Product {
         this.price = updateProductCommand.price;
         this.isActive = updateProductCommand.isActive || false;
         this.description = updateProductCommand.description;
+    }
+
+    public addStock(amount: number): void {
+        this.stock += amount;
+    }
+
+    public removeStock(amount: number, mailerService: EmailSenderServiceInterface): void {
+        if (this.stock <= 0) return;
+
+        this.stock = Math.max(0, this.stock - amount);
+        
+        if (this.stock === 0) {
+            mailerService.sendMail('EAU PUTIN Y A PLURIEN DANS LA RMOIR!!!!!!!');
+        }
     }
 }

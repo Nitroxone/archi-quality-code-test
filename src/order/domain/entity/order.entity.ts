@@ -9,6 +9,7 @@ import {
 import { Expose } from 'class-transformer';
 
 import { BadRequestException } from '@nestjs/common';
+import { EmailSenderServiceInterface } from 'src/product/domain/port/email/email-sender.service.interface';
 
 export interface CreateOrderCommand {
   items: ItemDetailCommand[];
@@ -227,5 +228,17 @@ export class Order {
       .map((item) => item.product.name)
       .join(', ');
     return `invoice number ${this.id}, with items: ${itemsNames}`;
+  }
+
+  public removeProductsStock(mailerService: EmailSenderServiceInterface): void {
+    this.orderItems.forEach(it => {
+      it.product.removeStock(it.quantity, mailerService);
+    });
+  }
+
+  public addProductsStock(): void {
+    this.orderItems.forEach(it => {
+      it.product.addStock(it.quantity);
+    });
   }
 }

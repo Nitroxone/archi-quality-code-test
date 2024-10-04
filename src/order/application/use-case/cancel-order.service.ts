@@ -13,6 +13,7 @@ export class CancelOrderService {
     }
 
     order.cancel(cancelReason);
+    order.addProductsStock();
 
     return this.orderRepository.save(order);
   }
