@@ -10,6 +10,7 @@ import { Expose } from 'class-transformer';
 
 import { BadRequestException } from '@nestjs/common';
 import { EmailSenderServiceInterface } from 'src/product/domain/port/email/email-sender.service.interface';
+import { Discount } from 'src/discount/domain/entity/discount.entity';
 
 export interface CreateOrderCommand {
   items: ItemDetailCommand[];
@@ -106,7 +107,7 @@ export class Order {
     this.price = this.calculateOrderAmount(createOrderCommand.items);
   }
 
-  pay(): void {
+  pay(discount?: Discount): void {
     if (this.status !== OrderStatus.PENDING) {
       throw new Error('Commande déjà payée');
     }
@@ -115,8 +116,16 @@ export class Order {
       throw new Error('Montant maximum dépassé');
     }
 
+    if (discount) {
+      this.applyDiscount(discount);
+    }
+    
     this.status = OrderStatus.PAID;
     this.paidAt = new Date();
+  }
+
+  applyDiscount(discount: Discount) {
+    this.price = Math.max(0, this.price - discount.amount);
   }
 
   setShippingAddress(customerAddress: string): void {
@@ -156,25 +165,6 @@ export class Order {
       throw new BadRequestException('Missing required fields');
     }
   }
-
-  // methode factory : permet de ne pas utiliser le constructor
-  // car le constructor est utilisé par typeorm
-  // public createOrder(createOrderCommand: CreateOrderCommand): Order {
-  //   this.verifyOrderCommandIsValid(createOrderCommand);
-  //   this.verifyMaxItemIsValid(createOrderCommand);
-
-  //   this.orderItems = createOrderCommand.items.map(
-  //     (item) => new OrderItem(item),
-  //   );
-
-  //   this.customerName = createOrderCommand.customerName;
-  //   this.shippingAddress = createOrderCommand.shippingAddress;
-  //   this.invoiceAddress = createOrderCommand.invoiceAddress;
-  //   this.status = OrderStatus.PENDING;
-  //   this.price = this.calculateOrderAmount(createOrderCommand.items);
-
-  //   return this;
-  // }
 
   private calculateOrderAmount(items: ItemDetailCommand[]): number {
     const totalAmount = items.reduce((sum, item) => sum + item.price, 0);
@@ -232,8 +222,12 @@ export class Order {
 
   public removeProductsStock(mailerService: EmailSenderServiceInterface): void {
     this.orderItems.forEach(it => {
-      it.product.removeStock(it.quantity, mailerService);
+      this.removeProductStock(it, mailerService);
     });
+  }
+
+  public removeProductStock(item: OrderItem, mailerService: EmailSenderServiceInterface): void {
+    item.product.removeStock(item.quantity, mailerService);
   }
 
   public addProductsStock(): void {
