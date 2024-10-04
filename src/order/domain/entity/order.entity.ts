@@ -224,7 +224,7 @@ export class Order {
     }
 
     const itemsNames = this.orderItems
-      .map((item) => item.productName)
+      .map((item) => item.product.name)
       .join(', ');
     return `invoice number ${this.id}, with items: ${itemsNames}`;
   }

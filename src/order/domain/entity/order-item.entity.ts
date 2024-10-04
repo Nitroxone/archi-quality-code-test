@@ -3,7 +3,7 @@ import { Order } from '../entity/order.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export interface ItemDetailCommand {
-  productName: string;
+  product: Product;
   price: number;
   quantity: number;
 }
@@ -14,9 +14,6 @@ export class OrderItem {
 
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  productName: string;
 
   @Column({
     type: 'int',
@@ -44,7 +41,7 @@ export class OrderItem {
       );
     }
 
-    this.productName = itemCommand.productName;
+    this.product = itemCommand.product;
     this.quantity = itemCommand.quantity;
     this.price = itemCommand.price * this.product.price;
   }
