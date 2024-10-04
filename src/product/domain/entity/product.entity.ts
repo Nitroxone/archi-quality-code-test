@@ -7,6 +7,15 @@ export interface CreateProductCommand {
     price: number;
     description: string;
     stock?: number;
+    isActive?: boolean;
+}
+
+export interface UpdateProductCommand {
+    name: string;
+    price: number;
+    description: string;
+    stock?: number;
+    isActive?: boolean;
 }
 
 @Entity()
@@ -47,21 +56,35 @@ export class Product {
         this.verifyProductIsValid(createProductCommand);
         this.initializeStock(createProductCommand);
         this.createdAt = new Date();
+        this.name = createProductCommand.name;
+        this.price = createProductCommand.price;
+        this.isActive = createProductCommand.isActive || false;
+        this.description = createProductCommand.description;
     }
 
-    private verifyProductIsValid(createProductCommand: CreateProductCommand): void {
+    private verifyProductIsValid(productCommand: CreateProductCommand|UpdateProductCommand): void {
         if(
-            !createProductCommand.name
-            || createProductCommand.name === ''
-            || !createProductCommand.description
-            || createProductCommand.description === ''
-            || !createProductCommand.price
+            !productCommand.name
+            || productCommand.name === ''
+            || !productCommand.description
+            || productCommand.description === ''
+            || !productCommand.price
         ) {
             throw new BadRequestException('Missing required fields!');
         }
     }
 
-    private initializeStock(createProductCommand: CreateProductCommand): void {
-        this.stock = createProductCommand.stock || 0;
+    private initializeStock(productCommand: CreateProductCommand|UpdateProductCommand): void {
+        this.stock = productCommand.stock || 0;
+    }
+
+    public update(updateProductCommand: UpdateProductCommand) {
+        this.verifyProductIsValid(updateProductCommand);
+        this.initializeStock(updateProductCommand);
+        this.createdAt = new Date();
+        this.name = updateProductCommand.name;
+        this.price = updateProductCommand.price;
+        this.isActive = updateProductCommand.isActive || false;
+        this.description = updateProductCommand.description;
     }
 }
