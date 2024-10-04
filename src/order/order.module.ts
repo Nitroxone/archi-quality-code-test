@@ -13,6 +13,8 @@ import { OrderRepositoryInterface } from 'src/order/domain/port/persistance/orde
 import { GenerateInvoiceService } from 'src/order/application/use-case/generate-invoice.service';
 import { PdfGeneratorServiceInterface } from 'src/order/domain/port/pdf/pdf-generator.service.interface';
 import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.service';
+import { EmailSenderServiceInterface } from 'src/product/domain/port/email/email-sender.service.interface';
+import { EmailSenderService } from 'src/product/infrastructure/email/email-sender.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderItem])],
@@ -21,6 +23,7 @@ import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.
   providers: [
     OrderRepositoryTypeOrm,
     PdfGeneratorService,
+    EmailSenderService,
 
     {
       provide: GenerateInvoiceService,
@@ -72,8 +75,8 @@ import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.
       // quand j'enregistre la classe CreateOrderService
       provide: CreateOrderService,
       // je demande à Nest Js de créer une instance de cette classe
-      useFactory: (orderRepository: OrderRepositoryInterface) => {
-        return new CreateOrderService(orderRepository);
+      useFactory: (orderRepository: OrderRepositoryInterface, mailerService: EmailSenderServiceInterface) => {
+        return new CreateOrderService(orderRepository, mailerService);
       },
       // en lui injectant une instance de OrderRepositoryTypeOrm
       // à la place de l'interface qui est utilisée dans le constructeur de CreateOrderService
