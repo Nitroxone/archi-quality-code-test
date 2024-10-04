@@ -3,7 +3,7 @@ import { Product } from 'src/product/domain/entity/product.entity';
 import { ProductRepositoryInterface } from '../../domain/port/persistance/product.repository.interface';
 import { DataSource, Repository } from 'typeorm';
 
-export default class OrderRepositoryTypeOrm
+export default class ProductRepositoryTypeOrm
   extends Repository<Product>
   implements ProductRepositoryInterface
 {

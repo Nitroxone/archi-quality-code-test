@@ -1,4 +1,4 @@
-import { Product } from 'src/product/domain/entity/product.entity';
+import { Product } from '../../../product/domain/entity/product.entity';
 import { Order } from '../entity/order.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
